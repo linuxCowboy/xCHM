@@ -350,43 +350,40 @@ void CHMHtmlWindow::OnChar(wxKeyEvent& event)
 {
     auto xStart = 0, yStart = 0, xSize = 0, ySize = 0, xUnit = 0, yUnit = 0;
     int overlap = 3;
+    bool skip = true;
 
     GetViewStart(&xStart, &yStart);
     GetClientSize(&xSize, &ySize);
     GetScrollPixelsPerUnit(&xUnit, &yUnit);
 
     switch (event.GetKeyCode()) {
-    case WXK_SPACE: {
+    case WXK_PAGEDOWN:
+    case WXK_SPACE:
         Scroll(xStart, yStart + ySize / yUnit - overlap);
+        skip = false;
         break;
-    }
-    case WXK_PAGEDOWN: {
-        Scroll(xStart, yStart + ySize / yUnit - overlap + 1);
-        event.m_keyCode = WXK_UP;
-        break;
-    }
-    case WXK_BACK: {
+
+    case WXK_PAGEUP:
+    case WXK_BACK:
         Scroll(xStart, yStart - ySize / yUnit + overlap);
+        skip = false;
         break;
-    }
-    case WXK_PAGEUP: {
-        Scroll(xStart, yStart - ySize / yUnit + overlap - 1);
-        event.m_keyCode = WXK_DOWN;
-        break;
-    }
+
     case WXK_ESCAPE:
         _frame->ToggleFullScreen(true);
         break;
-    case 'g':
+
     case WXK_HOME:
+    case 'g':
         Scroll(0, 0);
         break;
+
     case WXK_END:
-    case 'G': {
+    case 'G':
         GetVirtualSize(&xSize, &ySize);
         Scroll(0, ySize / yUnit);
         break;
-    }
+
     case 'j':
         event.m_keyCode = WXK_DOWN;
         break;
@@ -399,11 +396,12 @@ void CHMHtmlWindow::OnChar(wxKeyEvent& event)
     case 'l':
         event.m_keyCode = WXK_RIGHT;
         break;
+
     default:
         break;
     }
 
-    event.Skip();
+    event.Skip(skip);
 }
 
 void CHMHtmlWindow::OnSetTitle(const wxString& title)
